@@ -1,48 +1,40 @@
 from turtle import Screen, Turtle
-
-# x_pos = 350
-# y_pos = 0
+from paddle import Paddle
+from ball import Ball
+import time
 
 screen = Screen()
 screen.bgcolor("black")
 screen.setup(width=800, height=600)
 screen.title("Pong Game")
 
-#no need for speeding up the turtule when we can use the Tracer method
-#here '0' in the parenthesis means that to turn the animation off.
 screen.tracer(0) 
 
-paddle = Turtle()
-paddle.color("white")
-paddle.shape("square")
-# paddle.speed("fastest")
-paddle.pu()
-paddle.shapesize(stretch_wid=5, stretch_len=1)
-# paddle.goto(x_pos, y_pos)
-paddle.goto(350, 0)
+r_paddle = Paddle((350, 0))
+l_paddle = Paddle((-350, 0))
+ball = Ball()
 
-
-
-def paddle_up():
-    # global y_pos
-    # y_pos += 20
-    # paddle.goto(x_pos, y_pos)
-    new_y_cor = paddle.ycor() + 20
-    paddle.goto(paddle.xcor(), new_y_cor)
-
-def paddle_down():
-    # global y_pos
-    # y_pos -= 20
-    # paddle.goto(x_pos, y_pos)
-    new_y_cor = paddle.ycor() - 20
-    paddle.goto(paddle.xcor(), new_y_cor)
 
 screen.listen()
-screen.onkey(fun=paddle_up, key='Up')
-screen.onkey(fun=paddle_down, key='Down')
+screen.onkey(fun=l_paddle.go_up, key='w')
+screen.onkey(fun=l_paddle.go_down, key='s')
+
+screen.onkey(fun=r_paddle.go_up, key='Up')
+screen.onkey(fun=r_paddle.go_down, key='Down')
 
 game_is_on = True
 while game_is_on:
+    time.sleep(0.1)
+    ball.move()
     screen.update()
+
+    # Detect collusion with the top and bottom walls
+    if ball.ycor() > 280 or ball.ycor() < -280:
+        ball.bounce_y()
+
+    # detect collusion with the padddle
+    if ball.distance(r_paddle) < 50 and ball.xcor() >  320 or ball.distance(l_paddle) < 50 and ball.xcor() < -320:
+        ball.bounce_x()
+
 
 screen.exitonclick()
